@@ -5,6 +5,7 @@ import { Input } from "../components/ui/input";
 import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "../components/ui/card";
 import { Label } from "../components/ui/label";
 import { toast } from "../hooks/use-toast";
+import supabase from "../lib/supabase";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -16,17 +17,12 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data?.statusMessage || "Login failed");
-      localStorage.setItem("auth_token", data.token);
-      toast({ title: "Success", description: "Logged in" });
-      navigate("/dashboard");
-    } catch (err: any) {
+          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+          // Session is persisted automatically by Supabase
+          toast({ title: "Success", description: "Logged in" });
+          navigate("/dashboard");
+        } catch (err: any) {
       toast({ title: "Error", description: err.message, variant: "destructive" });
     } finally {
       setLoading(false);
