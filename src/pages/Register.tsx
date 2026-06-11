@@ -1,4 +1,5 @@
 import { useState } from "react";
+import supabase from "../lib/supabase";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -21,7 +22,7 @@ export default function Register() {
     }
     setLoading(true);
     try {
-      const res = await fetch("/api/auth.register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
+      const { data, error } = await supabase.auth.signUp({ email, password });
       if (!res.ok) {
         const data = await res.json();
         throw new Error(data?.statusMessage || "Registration failed");
