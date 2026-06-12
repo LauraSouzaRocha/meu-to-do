@@ -1,119 +1,70 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Separator } from "@/components/ui/separator";
-import { Google, Github } from "lucide-react";
-import supabase from "@/lib/supabase";
-import { toast } from "@/utils/toast";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/todo/hooks/useAuth";
+import { useNavigate, Link } from "react-router-dom";
+
+const schema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+});
+
+type FormValues = z.infer<typeof schema>;
 
 export default function Login() {
+  const { login } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({ resolver: zodResolver(schema) });
+
+  const onSubmit = async (data: FormValues) => {
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-      toast({ title: "Success", description: "Logged in" });
+      await login({ email: data.email, password: data.password });
+      toast.success("Logged in");
       navigate("/dashboard");
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    } finally {
-      setLoading(false);
+    } catch (e: any) {
+      toast.error(e.message);
     }
   };
 
-  const handleSocial = (provider: string) => {
-    toast({ title: "Info", description: `Social login (${provider}) is not implemented yet.` });
-  };
-
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-      <Card className="w-full max-w-md rounded-xl shadow-lg border bg-white">
-        <CardHeader className="flex flex-col items-center space-y-4">
-          <img
-src="https://supabase.com/img/supabase-logo.png"
-          alt="Supabase"
-          className="h-12 w-auto"
-        />
-        <CardTitle className="text-2xl text-center">Login</CardTitle>
-        <p className="text-sm text-muted-foreground">Authentication via Supabase Auth</p>
-      </CardHeader>
-
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              type="password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-
-          <Button type="submit" className="w-full" disabled={loading}>
-            {loading ? "Logging in…" : "Entrar"}
-          </Button>
-
-          {/* Separator with text */}
-          <div className="flex items-center my-4">
-            <Separator />
-            <span className="px-2 text-sm text-muted-foreground">Ou continue com</span>
-            <Separator />
-          </div>
-
-          {/* Social buttons */}
-          <div className="flex flex-col space-y-3">
-            <Button
-              type="button"
-              variant="outline"
-              className="flex items-center justify-center space-x-2"
-              onClick={() => handleSocial("google")}
-            >
-              <Google className="h-4 w-4" />
-              <span>Continuar com Google</span>
-            </Button>
-
-            <Button
-              type="button"
-              variant="outline"
-              className="flex items-center justify-center space-x-2"
-              onClick={() => handleSocial("github")}
-            >
-              <Github className="h-4 w-4" />
-              <span>Continuar com GitHub</span>
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-
-      <CardFooter className="flex justify-center">
-        <a href="/register" className="text-sm text-primary hover:underline">
-          Não tem conta? Registre‑se
-        </a>
-      </CardFooter>
-    </Card>
-  </div>
-);
+    <div className="max-w-md mx-auto mt-20 p-6 border rounded shadow">
+      <h1 className="text-2xl mb-4">Login</h1>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div>
+          <label>Email</label>
+          <input {...register("email")} className="w-full border rounded p-2" />
+          {errors.email && (
+            <p className="text-sm text-red-600">{errors.email.message}</p>
+          )}
+        </div>
+        <div>
+          <label>Password</label>
+          <input
+            type="password"
+            {...register("password")}
+            className="w-full border rounded p-2"
+          />
+          {errors.password && (
+            <p className="text-sm text-red-600">{errors.password.message}</p>
+          )}
+        </div>
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full py-2 bg-indigo-600 text-white rounded"
+        >
+          {isSubmitting ? "Logging…" : "Login"}
+        </button>
+      </form>
+      <p className="mt-4">
+        No account? <Link to="/register" className="text-indigo-600">Register</Link>
+      </p>
+    </div>
+  );
+}

@@ -1,95 +1,68 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import supabase from "@/lib/supabase";
-import { toast } from "@/utils/toast";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/todo/hooks/useAuth";
+import { useNavigate, Link } from "react-router-dom";
+
+const schema = z.object({
+  email: z.string().email(),
+  password: z.string().min(6),
+  fullName: z.string().min(1),
+});
+
+type FormValues = z.infer<typeof schema>;
 
 export default function Register() {
+  const { register: registerUser } = useAuth();
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [loading, setLoading] = useState(false);
 
-const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password !== confirm) {
-      toast({ title: "Error", description: "Passwords do not match", variant: "destructive" });
-      return;
-    }
-    setLoading(true);
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<FormValues>({ resolver: zodResolver(schema) });
+
+  const onSubmit = async (data: FormValues) => {
     try {
-      const { error } = await supabase.auth.signUp({ email, password });
-      if (error) throw error;
-      toast({ title: "Success", description: "Account created. You can now log in." });
+      await registerUser({
+        email: data.email,
+        password: data.password,
+        fullName: data.fullName,
+      });
+      toast.success("Account created");
       navigate("/login");
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    } finally {
-      setLoading(false);
+    } catch (e: any) {
+      toast.error(e.message);
     }
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-      <Card className="w-full max-w-md rounded-xl shadow-lg border bg-white">
-        <CardHeader className="flex flex-col items-center space-y-2">
-          <img
-            src="https://supabase.com/img/supabase-logo.png"
-            alt="Supabase"
-            className="h-12 w-auto"
-          />
-          <CardTitle className="text-2xl text-center">Create Account</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <Label htmlFor="confirm">Confirm Password</Label>
-              <Input
-                id="confirm"
-                type="password"
-                placeholder="••••••••"
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                required
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Creating…" : "Register"}
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-center">
-          <a href="/login" className="text-sm text-primary hover:underline">
-            Already have an account? Log in
-          </a>
-        </CardFooter>
-      </Card>
+    <div className="max-w-md mx-auto mt-20 p-6 border rounded shadow">
+      <h1 className="text-2xl mb-4">Register</h1>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        <div>
+          <label>Name</label>
+          <input {...register("fullName")} className="w-full border rounded p-2" />
+          {errors.fullName && <p className="text-sm text-red-600">{errors.fullName.message}</p>}
+        </div>
+        <div>
+          <label>Email</label>
+          <input {...register("email")} className="w-full border rounded p-2" />
+          {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
+        </div>
+        <div>
+          <label>Password</label>
+          <input type="password" {...register("password")} className="w-full border rounded p-2" />
+          {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
+        </div>
+        <button type="submit" disabled={isSubmitting} className="w-full py-2 bg-indigo-600 text-white rounded">
+          {isSubmitting ? "Registering…" : "Register"}
+        </button>
+      </form>
+      <p className="mt-4">
+        Already have an account? <Link to="/login" className="text-indigo-600">Login</Link>
+      </p>
     </div>
   );
 }
