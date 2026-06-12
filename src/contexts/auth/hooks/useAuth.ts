@@ -10,7 +10,7 @@ import {
   UseAuthReturn,
 } from "../auth.types";
 import * as authService from "../services/auth.service";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase } from "@/lib/supabase";
 
 /**
  * Custom hook that tracks the current authentication state.

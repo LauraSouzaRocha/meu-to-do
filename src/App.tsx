@@ -8,7 +8,8 @@ import NotFound from "./pages/NotFound";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-import { ProtectedRoute } from "./components/ProtectedRoute";
+import Home from "./pages/Home";
+import { ProtectedRoute } from "./components/common/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
