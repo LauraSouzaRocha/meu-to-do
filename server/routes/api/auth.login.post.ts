@@ -2,7 +2,7 @@ import { defineHandler, useRuntimeConfig } from "nitro";
 import { readBody, createError } from "nitro/h3";
 import { compare } from "bcryptjs";
 import jwt from "jsonwebtoken";
-import { findUser } from "../../store/users";
+import { findUser } from "../../utils/users";
 
 export default defineHandler(async (event) => {
   const body = await readBody<{ email?: string; password?: string }>(event);
