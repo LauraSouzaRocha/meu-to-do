@@ -13,7 +13,6 @@ import { Label } from "../components/ui/label";
 import { toast } from "../hooks/use-toast";
 import supabase from "../lib/supabase";
 import { Separator } from "../components/ui/separator";
-import { LucideIcon } from "lucide-react";
 import { Google, Github } from "lucide-react";
 
 export default function Login() {
@@ -50,8 +49,7 @@ export default function Login() {
   const handleSocial = (provider: string) => {
     toast({
       title: "Info",
-      description:
-        "Integração disponível em versões futuras.",
+      description: "Integração disponível em versões futuras.",
     });
   };
 
@@ -65,10 +63,7 @@ export default function Login() {
             alt="Supabase"
             className="h-12 w-auto"
           />
-          <CardTitle className="text-2xl text-center">
-            Login
-          </CardTitle>
-          {/* Seal / branding text */}
+          <CardTitle className="text-2xl text-center">Login</CardTitle>
           <p className="text-sm text-muted-foreground">
             Autenticação via Supabase Auth
           </p>
@@ -105,7 +100,7 @@ export default function Login() {
               className="w-full"
               disabled={loading}
             >
-              {loading ? "Logging in{loading ? "Logging in..." : "Entrar"}
+              {loading ? "Logging in..." : "Entrar"}
             </Button>
 
             {/* Separator with text */}
@@ -143,14 +138,14 @@ export default function Login() {
         </CardContent>
 
         <CardFooter className="flex justify-center">
-          <a
-            href="/register"
-            className="text-sm text-primary hover:underline"
-          >
-            Não tem conta? Registre‑se
-          </a>
-        </CardFooter>
-      </Card>
-    </div>
-  );
+          <a href="/register" className="text<a
+              href="/register"
+              className="text-sm text-primary hover:underline"
+            >
+              Não tem conta? Registre‑se
+            </a>
+          </CardFooter>
+        </Card>
+      </div>
+    );
 }
