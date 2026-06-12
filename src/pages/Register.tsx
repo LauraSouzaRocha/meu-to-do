@@ -14,26 +14,45 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (password !== confirm) {
-      toast({ title: "Error", description: "Passwords do not match", variant: "destructive" });
-      return;
-    }
-    setLoading(true);
-    try {
-      const res = await fetch("/api/auth.register", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email, password }) });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data?.statusMessage || "Registration failed");
-      }
-      toast({ title: "Success", description: "Account created. You can now log in." });
-      navigate("/login");
-    } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
-    } finally {
-      setLoading(false);
-    }
-  };
+  e.preventDefault();
+
+  if (password !== confirm) {
+    toast({
+      title: "Error",
+      description: "Passwords do not match",
+      variant: "destructive",
+    });
+    return;
+  }
+
+  setLoading(true);
+
+  try {
+    const { supabase } = await import("../lib/supabase");
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) throw error;
+
+    toast({
+      title: "Success",
+      description: "Account created successfully",
+    });
+
+    navigate("/login");
+  } catch (err: any) {
+    toast({
+      title: "Error",
+      description: err.message,
+      variant: "destructive",
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
