@@ -1,4 +1,4 @@
-import { defineHandler, useRuntimeConfig } from "nitro";
+import { defineHandler } from "nitro";
 import { readBody, createError } from "nitro/h3";
 import { compare } from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -32,11 +32,9 @@ export default defineHandler(async (event) => {
     });
   }
 
-  const config = useRuntimeConfig();
-
   const token = jwt.sign(
     { sub: user.email },
-    config.JWT_SECRET || "devsecret",
+    "devsecret",
     { expiresIn: "1h" }
   );
 
