@@ -2,10 +2,19 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "../components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "../components/ui/card";
 import { Label } from "../components/ui/label";
 import { toast } from "../hooks/use-toast";
 import supabase from "../lib/supabase";
+import { Separator } from "../components/ui/separator";
+import { LucideIcon } from "lucide-react";
+import { Google, Github } from "lucide-react";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -17,41 +26,129 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
     try {
-          const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-          if (error) throw error;
-          // Session is persisted automatically by Supabase
-          toast({ title: "Success", description: "Logged in" });
-          navigate("/dashboard");
-        } catch (err: any) {
-      toast({ title: "Error", description: err.message, variant: "destructive" });
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      if (error) throw error;
+      toast({
+        title: "Success",
+        description: "Logged in",
+      });
+      navigate("/dashboard");
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+      });
     } finally {
       setLoading(false);
     }
   };
 
+  const handleSocial = (provider: string) => {
+    toast({
+      title: "Info",
+      description:
+        "Integração disponível em versões futuras.",
+    });
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">Login</CardTitle>
+      <Card className="w-full max-w-md rounded-xl shadow-lg border bg-white">
+        <CardHeader className="flex flex-col items-center space-y-4">
+          {/* Supabase logo */}
+          <img
+            src="https://supabase.com/img/supabase-logo.png"
+            alt="Supabase"
+            className="h-12 w-auto"
+          />
+          <CardTitle className="text-2xl text-center">
+            Login
+          </CardTitle>
+          {/* Seal / branding text */}
+          <p className="text-sm text-muted-foreground">
+            Autenticação via Supabase Auth
+          </p>
         </CardHeader>
+
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <Input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
+
             <div>
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <Input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Logging in..." : "Login"}
+
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={loading}
+            >
+              {loading ? "Logging in{loading ? "Logging in..." : "Entrar"}
             </Button>
+
+            {/* Separator with text */}
+            <div className="flex items-center my-4">
+              <Separator />
+              <span className="px-2 text-sm text-muted-foreground">
+                Ou continue com
+              </span>
+              <Separator />
+            </div>
+
+            {/* Social buttons */}
+            <div className="flex flex-col space-y-3">
+              <Button
+                type="button"
+                variant="outline"
+                className="flex items-center justify-center space-x-2"
+                onClick={() => handleSocial("google")}
+              >
+                <Google className="h-4 w-4" />
+                <span>Continuar com Google</span>
+              </Button>
+
+              <Button
+                type="button"
+                variant="outline"
+                className="flex items-center justify-center space-x-2"
+                onClick={() => handleSocial("github")}
+              >
+                <Github className="h-4 w-4" />
+                <span>Continuar com GitHub</span>
+              </Button>
+            </div>
           </form>
         </CardContent>
+
         <CardFooter className="flex justify-center">
-          <a href="/register" className="text-sm text-primary hover:underline">Don't have an account? Register</a>
+          <a
+            href="/register"
+            className="text-sm text-primary hover:underline"
+          >
+            Não tem conta? Registre‑se
+          </a>
         </CardFooter>
       </Card>
     </div>
