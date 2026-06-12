@@ -133,12 +133,13 @@ export default function Login() {
                 <Github className="h-4 w-4" />
                 <span>Continuar com GitHub</span>
               </Button>
-            </div>
-          </form>
-        </CardContent>
+</Button>
+              </div>
+            </form>
+          </CardContent>
 
-        <CardFooter className="flex justify-center">
-          <a href="/register" className="text<a
+          <CardFooter className="flex justify-center">
+            <a
               href="/register"
               className="text-sm text-primary hover:underline"
             >
@@ -147,5 +148,6 @@ export default function Login() {
           </CardFooter>
         </Card>
       </div>
-    );
+    </div>
+  );
 }
