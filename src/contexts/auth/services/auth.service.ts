@@ -61,6 +61,6 @@ export async function signUp(email: string, password: string): Promise<AuthRespo
  *
  * @returns A promise that resolves when the sign‑out operation completes.
  */
-exportexport async function signOut(): Promise<void> {
+export async function signOut(): Promise<void> {
   await supabase.auth.signOut();
 }
