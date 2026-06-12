@@ -1,9 +1,28 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuth } from "@/contexts/todo/hooks/useAuth";
+import { useEffect, useState } from "react";
+import supabase from "../lib/supabase";
 
 export const ProtectedRoute = () => {
-  const { user, isLoading } = useAuth();
+  const [authenticated, setAuthenticated] = useState<boolean | null>(null);
 
-  if (isLoading) return null;
-  return user ? <Outlet /> : <Navigate to="/login" replace />;
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setAuthenticated(!!user);
+    };
+    checkAuth();
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthenticated(!!session?.user);
+    });
+    return () => {
+      listener?.subscription.unsubscribe();
+    };
+  }, []);
+
+  if (authenticated === null) {
+    // loading state
+    return null;
+  }
+
+  return authenticated ? <Outlet /> : <Navigate to="/login" replace />;
 };
