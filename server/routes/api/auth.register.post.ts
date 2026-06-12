@@ -1,7 +1,7 @@
 import { defineHandler } from "nitro";
 import { readBody, createError } from "nitro/h3";
 import { hash } from "bcryptjs";
-import { addUser, findUser } from "../../store/users";
+import { addUser, findUser } from "../../utils/users";
 
 export default defineHandler(async (event) => {
   const body = await readBody<{ email?: string; password?: string }>(event);
