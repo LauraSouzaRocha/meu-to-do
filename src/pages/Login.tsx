@@ -41,13 +41,13 @@ export default function Login() {
 
       navigate("/home");
     } catch (err: any) {
+      console.error(err);
+
       toast({
         title: "Error",
         description: err.message,
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
     }
   };
 
