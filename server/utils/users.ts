@@ -3,5 +3,13 @@ export interface User {
   passwordHash: string;
 }
 
-// In‑memory user store – replace with real DB in production
+// In-memory user store
 export const users: User[] = [];
+
+export function findUser(email: string): User | undefined {
+  return users.find((u) => u.email === email);
+}
+
+export function addUser(user: User): void {
+  users.push(user);
+}
