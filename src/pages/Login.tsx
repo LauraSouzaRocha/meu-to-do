@@ -40,14 +40,16 @@ export default function Login() {
       });
 
       navigate("/home");
-    } catch (err: any) {
-      console.error(err);
+     } catch (err: any) {
+      console.error("LOGIN ERROR:", err);
 
       toast({
         title: "Error",
-        description: err.message,
+        description: err?.message || JSON.stringify(err),
         variant: "destructive",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
