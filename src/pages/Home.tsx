@@ -84,7 +84,13 @@ export default function Home() {
     <div className="flex min-h-screen items-start justify-center bg-gray-50 p-4">
       <Card className="w-full max-w-2xl">
         <CardHeader className="flex flex-col items-start gap-2">
-          <CardTitle className="text-2xl">Dashboard de Tarefas</CardTitle>
+          <CardTitle className="text-3xl text-blue-900">
+            Meu To Do
+          </CardTitle>
+
+          <p className="text-violet-700 font-medium">
+            Suas tarefas organizadas em um só lugar
+          </p>
           <p className="text-sm text-muted-foreground">
             Usuário: <span className="font-medium">{user?.email}</span>
           </p>
