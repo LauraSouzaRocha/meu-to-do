@@ -7,22 +7,30 @@ import { supabase } from "@/lib/supabase";
 import type { Task, CreateTaskInput, UpdateTaskInput } from "./task.types";
 
 export async function createTask(input: CreateTaskInput): Promise<Task> {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   if (!user) throw new Error("User not authenticated");
 
   const { data, error } = await supabase
-    .from<Task>('tasks')
-    .insert({
-      user_id: user.id,
-      title: input.title,
-      description: input.description,
-      completed: false,
-    })
-    .select()
-    .single();
+    .from("tasks")
+    .insert([
+      {
+        user_id: user.id,
+        title: input.title,
+        description: input.description,
+        completed: false,
+      },
+    ])
+    .select();
+
+  console.log("INSERT RESULT:", data);
+  console.log("INSERT ERROR:", error);
 
   if (error) throw error;
-  return data;
+
+  return data![0] as Task;
 }
 
 export async function getTasks(): Promise<Task[]> {
