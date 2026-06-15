@@ -39,7 +39,7 @@ export default function Login() {
         description: "Logged in successfully",
       });
 
-      navigate("/dashboard");
+      navigate("/home");
      } catch (err: any) {
       console.error("LOGIN ERROR:", err);
 
