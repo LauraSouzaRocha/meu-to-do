@@ -1,14 +1,26 @@
+Substitua TODO o conteúdo de `src/pages/Register.tsx` por:
+
+```tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/lib/supabase";
+
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
-import { Card, CardHeader, CardTitle, CardContent, CardFooter } from "../components/ui/card";
+import {
+  Card,
+  CardHeader,
+  CardContent,
+  CardFooter,
+} from "../components/ui/card";
 import { Label } from "../components/ui/label";
+
 import { toast } from "../hooks/use-toast";
+import { CheckSquare } from "lucide-react";
 
 export default function Register() {
   const navigate = useNavigate();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -19,8 +31,8 @@ export default function Register() {
 
     if (password !== confirm) {
       toast({
-        title: "Error",
-        description: "Passwords do not match",
+        title: "Erro",
+        description: "As senhas não coincidem",
         variant: "destructive",
       });
       return;
@@ -29,8 +41,6 @@ export default function Register() {
     setLoading(true);
 
     try {
-      const { supabase } = await import("../lib/supabase");
-
       const { error } = await supabase.auth.signUp({
         email,
         password,
@@ -39,14 +49,14 @@ export default function Register() {
       if (error) throw error;
 
       toast({
-        title: "Success",
-        description: "Account created successfully",
+        title: "Conta criada",
+        description: "Cadastro realizado com sucesso",
       });
 
       navigate("/login");
     } catch (err: any) {
       toast({
-        title: "Error",
+        title: "Erro",
         description: err.message,
         variant: "destructive",
       });
@@ -56,44 +66,78 @@ export default function Register() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <h1 className="text-4xl font-bold text-blue-900">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-slate-50 via-white to-purple-50 p-4">
+      <Card className="w-full max-w-md border-0 shadow-xl">
+        <CardHeader className="flex flex-col items-center space-y-3 pt-8">
+          <CheckSquare className="h-12 w-12 text-[#7c3aed]" />
+
+          <h1 className="text-4xl font-extrabold bg-gradient-to-r from-[#1e3a8a] to-[#7c3aed] bg-clip-text text-transparent">
             Meu To Do
           </h1>
 
-          <p className="text-gray-500 mt-2">
+          <p className="text-sm text-muted-foreground">
             Crie sua conta gratuitamente
           </p>
-
-          <CardTitle className="mt-6">
-            Cadastro
-          </CardTitle>
         </CardHeader>
+
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="email">Email</Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="mt-1"
+              />
             </div>
+
             <div>
-              <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+              <Label htmlFor="password">Senha</Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                className="mt-1"
+              />
             </div>
+
             <div>
-              <Label htmlFor="confirm">Confirm Password</Label>
-              <Input id="confirm" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
+              <Label htmlFor="confirm">Confirmar Senha</Label>
+              <Input
+                id="confirm"
+                type="password"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                required
+                className="mt-1"
+              />
             </div>
-            <Button type="submit" className="w-full bg-violet-600 hover:bg-violet-700" disabled={loading}>
-              {loading ? "Creating..." : "Register"}
+
+            <Button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-[#7c3aed] hover:bg-[#6d28d9]"
+            >
+              {loading ? "Criando..." : "Criar Conta"}
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-center">
-          <a href="/login" className="text-sm text-primary hover:underline">Already have an account? Log in</a>
+
+        <CardFooter className="justify-center">
+          <a
+            href="/login"
+            className="text-sm text-[#1e3a8a] hover:underline"
+          >
+            Já possui uma conta? Entrar
+          </a>
         </CardFooter>
       </Card>
     </div>
   );
 }
+```
