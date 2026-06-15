@@ -40,7 +40,7 @@ export default function Login() {
       });
 
       navigate("/home");
-     } catch (err: any) {
+    } catch (err: any) {
       console.error("LOGIN ERROR:", err);
 
       toast({
@@ -56,8 +56,18 @@ export default function Login() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
       <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">Login</CardTitle>
+        <CardHeader className="text-center">
+          <h1 className="text-4xl font-bold text-blue-900">
+            Meu To Do
+          </h1>
+
+          <p className="text-gray-500 mt-2">
+            Organize suas tarefas de forma simples
+          </p>
+
+          <CardTitle className="mt-6">
+            Entrar
+          </CardTitle>
         </CardHeader>
 
         <CardContent>
