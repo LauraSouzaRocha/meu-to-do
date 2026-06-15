@@ -15,51 +15,61 @@ export default function Register() {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (password !== confirm) {
-    toast({
-      title: "Error",
-      description: "Passwords do not match",
-      variant: "destructive",
-    });
-    return;
-  }
+    if (password !== confirm) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
+      return;
+    }
 
-  setLoading(true);
+    setLoading(true);
 
-  try {
-    const { supabase } = await import("../lib/supabase");
+    try {
+      const { supabase } = await import("../lib/supabase");
 
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
+      const { error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
 
-    if (error) throw error;
+      if (error) throw error;
 
-    toast({
-      title: "Success",
-      description: "Account created successfully",
-    });
+      toast({
+        title: "Success",
+        description: "Account created successfully",
+      });
 
-    navigate("/login");
-  } catch (err: any) {
-    toast({
-      title: "Error",
-      description: err.message,
-      variant: "destructive",
-    });
-  } finally {
-    setLoading(false);
-  }
-};
+      navigate("/login");
+    } catch (err: any) {
+      toast({
+        title: "Error",
+        description: err.message,
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
       <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">Create Account</CardTitle>
+        <CardHeader className="text-center">
+          <h1 className="text-4xl font-bold text-blue-900">
+            Meu To Do
+          </h1>
+
+          <p className="text-gray-500 mt-2">
+            Crie sua conta gratuitamente
+          </p>
+
+          <CardTitle className="mt-6">
+            Cadastro
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
