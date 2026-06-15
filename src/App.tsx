@@ -26,7 +26,7 @@ const App = () => (
           <Route path="/register" element={<Register />} />
 
           <Route element={<ProtectedRoute />}>
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/home" element={<Home />} />
           </Route>
 
           <Route path="*" element={<NotFound />} />
