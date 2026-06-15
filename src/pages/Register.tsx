@@ -85,7 +85,7 @@ export default function Register() {
               <Label htmlFor="confirm">Confirm Password</Label>
               <Input id="confirm" type="password" value={confirm} onChange={(e) => setConfirm(e.target.value)} required />
             </div>
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button type="submit" className="w-full bg-violet-600 hover:bg-violet-700" disabled={loading}>
               {loading ? "Creating..." : "Register"}
             </Button>
           </form>
