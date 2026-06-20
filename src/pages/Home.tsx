@@ -25,6 +25,18 @@ import type { Task, CreateTaskInput, UpdateTaskInput } from "@/services/tasks/ta
 import { TaskForm } from "@/components/tasks/TaskForm";
 import { TaskList } from "@/components/tasks/TaskList";
 
+import {
+  AlertDialog,
+  AlertDialogTrigger,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+
 export default function Home() {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
@@ -32,6 +44,14 @@ export default function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
+
+  // ------ DELETE CONFIRMATION ------
+  const [taskToDelete, setTaskToDelete] = useState<Task | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  // ------ UPDATE CONFIRMATION ------
+  const [pendingUpdate, setPendingUpdate] = useState<UpdateTaskInput | null>(null);
+  const [updateDialogOpen, setUpdateDialogOpen] = useState(false);
 
   const fetchTasks = async () => {
     setLoading(true);
@@ -59,14 +79,45 @@ export default function Home() {
     }
   };
 
-  const handleUpdate = async (input: UpdateTaskInput) => {
+  // ---- UPDATE ----
+  const handleUpdate = (input: UpdateTaskInput) => {
+    // abrir diálogo de confirmação
+    setPendingUpdate(input);
+    setUpdateDialogOpen(true);
+  };
+
+  const confirmUpdate = async () => {
+    if (!pendingUpdate) return;
     try {
-      await updateTask(input);
+      await updateTask(pendingUpdate);
       toast.success("Tarefa atualizada");
       setEditingTask(null);
       await fetchTasks();
     } catch {
       toast.error("Erro ao atualizar tarefa");
+    } finally {
+      setPendingUpdate(null);
+      setUpdateDialogOpen(false);
+    }
+  };
+
+  // ---- DELETE ----
+  const handleDelete = (task: Task) => {
+    setTaskToDelete(task);
+    setDeleteDialogOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!taskToDelete) return;
+    try {
+      await deleteTask(taskToDelete.id);
+      toast.success("Tarefa excluída");
+      await fetchTasks();
+    } catch {
+      toast.error("Erro ao excluir tarefa");
+    } finally {
+      setTaskToDelete(null);
+      setDeleteDialogOpen(false);
     }
   };
 
@@ -80,98 +131,78 @@ export default function Home() {
     }
   };
 
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-purple-50 p-6">
-      <div className="mx-auto max-w-5xl">
-
-        {/* Header */}
-        <div className="mb-8 flex flex-col gap-4 rounded-3xl bg-white p-8 shadow-xl md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-5xl font-extrabold bg-gradient-to-r from-[#1e3a8a] to-[#7c3aed] bg-clip-text text-transparent">
-              Meu To Do
-            </h1>
-
-            <p className="mt-2 text-violet-700 font-medium">
-              Organize suas tarefas de forma simples e produtiva
-            </p>
-
-            <p className="mt-3 text-sm text-muted-foreground">
-              Logado como{" "}
-              <span className="font-semibold text-slate-700">
-                {user?.email}
-              </span>
-            </p>
-          </div>
-
-          <Button
-            variant="outline"
-            onClick={handleLogout}
-            className="border-violet-300 text-violet-700 hover:bg-violet-50"
-          >
+    <div className="flex min-h-screen items-start justify-center bg-gray-50 p-4">
+      <Card className="w-full max-w-2xl">
+        <CardHeader className="flex flex-col items-start gap-2">
+          <CardTitle className="text-2xl">Dashboard de Tarefas</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Usuário: <span className="font-medium">{user?.email}</span>
+          </p>
+          <Button variant="outline" size="sm" onClick={handleLogout}>
             Sair
           </Button>
-        </div>
+        </CardHeader>
 
-        {/* Conteúdo */}
-        <div className="grid gap-6 lg:grid-cols-[380px_1fr]">
+        <CardContent>
+          {/* Formulário – criar ou editar */}
+          {editingTask ? (
+            <TaskForm
+              initialValues={editingTask}
+              onSubmit={handleUpdate}
+              submitLabel="Salvar"
+              onCancel={() => setEditingTask(null)}
+            />
+          ) : (
+            <TaskForm onSubmit={handleCreate} submitLabel="Criar" />
+          )}
 
-          {/* Criar tarefa */}
-          <Card className="border-0 shadow-xl">
-            <CardHeader>
-              <CardTitle className="text-xl text-slate-800">
-                {editingTask ? "Editar tarefa" : "Nova tarefa"}
-              </CardTitle>
-            </CardHeader>
+          {/* Lista de tarefas */}
+          <div className="mt-6">
+            <TaskList
+              tasks={tasks}
+              loading={loading}
+              onRefresh={fetchTasks}
+              onToggle={toggleTaskCompleted}
+              onEdit={(t) => setEditingTask(t)}
+              onDelete={handleDelete}
+            />
+          </div>
+        </CardContent>
 
-            <CardContent>
-              {editingTask ? (
-                <TaskForm
-                  initialValues={editingTask}
-                  onSubmit={handleUpdate}
-                  submitLabel="Salvar"
-                  onCancel={() => setEditingTask(null)}
-                />
-              ) : (
-                <TaskForm
-                  onSubmit={handleCreate}
-                  submitLabel="Criar tarefa"
-                />
-              )}
-            </CardContent>
-          </Card>
+        <CardFooter className="text-xs text-muted-foreground">
+          Atualizado em {new Date().toLocaleString()}
+        </CardFooter>
+      </Card>
 
-          {/* Lista */}
-          <Card className="border-0 shadow-xl">
-            <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                <span>Minhas tarefas</span>
+      {/* ---------- DELETE CONFIRMATION DIALOG ---------- */}
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Tem certeza que deseja excluir esta tarefa?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Esta ação não poderá ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete}>Excluir</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-                <span className="rounded-full bg-violet-100 px-3 py-1 text-sm text-violet-700">
-                  {tasks.length} tarefa{tasks.length !== 1 ? "s" : ""}
-                </span>
-              </CardTitle>
-            </CardHeader>
-
-            <CardContent>
-              <TaskList
-                tasks={tasks}
-                loading={loading}
-                onRefresh={fetchTasks}
-                onToggle={toggleTaskCompleted}
-                onEdit={(t) => setEditingTask(t)}
-                onDelete={deleteTask}
-              />
-            </CardContent>
-
-            <CardFooter className="text-xs text-muted-foreground">
-              Atualizado em {new Date().toLocaleString()}
-            </CardFooter>
-          </Card>
-
-        </div>
-      </div>
+      {/* ---------- UPDATE CONFIRMATION DIALOG ---------- */}
+      <AlertDialog open={updateDialogOpen} onOpenChange={setUpdateDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Deseja realmente salvar as alterações desta tarefa?</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmUpdate}>Confirmar</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
-
 }
