@@ -22,14 +22,7 @@ import { Button } from "@/components/ui/button";
 
 import type { CreateTaskInput, UpdateTaskInput } from "@/services/tasks/task.types";
 
-useEffect(() => {
-  if (initialValues) {
-    form.reset({
-      title: initialValues.title ?? "",
-      description: initialValues.description ?? "",
-    });
-  }
-}, [initialValues, form]);
+
 type Props = {
   initialValues?: UpdateTaskInput;
   onSubmit: (values: CreateTaskInput | UpdateTaskInput) => Promise<void>;
