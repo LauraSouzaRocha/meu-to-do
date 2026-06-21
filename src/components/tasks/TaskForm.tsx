@@ -45,6 +45,14 @@ export const TaskForm = ({ initialValues, onSubmit, submitLabel, onCancel }: Pro
       description: initialValues?.description ?? "",
     },
   });
+  useEffect(() => {
+    if (initialValues) {
+      form.reset({
+        title: initialValues.title ?? "",
+        description: initialValues.description ?? "",
+      });
+    }
+  }, [initialValues, form]);
 
   const handleSubmit = async (values: FormValues) => {
     try {
