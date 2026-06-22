@@ -43,16 +43,14 @@ export const TaskList = ({ tasks, loading, onRefresh, onToggle, onEdit, onDelete
           }}
           onEdit={onEdit}
           onDelete={async (task) => {
-            if (window.confirm("Excluir esta tarefa?")) {
-              try {
-                await onDelete(task);
-                await onRefresh();
-                toast.success("Tarefa excluída");
-              } catch {
-                toast.error("Erro ao excluir tarefa");
-              }
+            try {
+              await onDelete(task);
+            } catch {
+              toast.error("Erro ao excluir tarefa");
             }
           }}
+
+
         />
       ))}
     </div>
