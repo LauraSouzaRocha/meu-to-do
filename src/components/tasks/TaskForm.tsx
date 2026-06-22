@@ -51,6 +51,11 @@ export const TaskForm = ({ initialValues, onSubmit, submitLabel, onCancel }: Pro
         title: initialValues.title ?? "",
         description: initialValues.description ?? "",
       });
+    } else {
+      form.reset({
+        title: "",
+        description: "",
+      });
     }
   }, [initialValues, form]);
 
